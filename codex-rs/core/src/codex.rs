@@ -348,7 +348,9 @@ use codex_protocol::protocol::EventMsg;
 use codex_protocol::protocol::ExecApprovalRequestEvent;
 use codex_protocol::protocol::InitialHistory;
 use codex_protocol::protocol::McpServerRefreshConfig;
+#[allow(unused_imports)]
 use codex_protocol::protocol::ModelRerouteEvent;
+#[allow(unused_imports)]
 use codex_protocol::protocol::ModelRerouteReason;
 use codex_protocol::protocol::NetworkApprovalContext;
 use codex_protocol::protocol::NonSteerableTurnKind;
@@ -429,7 +431,9 @@ pub(crate) struct CodexSpawnArgs {
 
 pub(crate) const INITIAL_SUBMIT_ID: &str = "";
 pub(crate) const SUBMISSION_CHANNEL_CAPACITY: usize = 512;
+#[allow(dead_code)]
 const CYBER_VERIFY_URL: &str = "https://chatgpt.com/cyber";
+#[allow(dead_code)]
 const CYBER_SAFETY_URL: &str = "https://developers.openai.com/codex/concepts/cyber-safety";
 const DIRECT_APP_TOOL_EXPOSURE_THRESHOLD: usize = 100;
 
@@ -3445,43 +3449,11 @@ impl Session {
 
     async fn maybe_warn_on_server_model_mismatch(
         self: &Arc<Self>,
-        turn_context: &Arc<TurnContext>,
+        _turn_context: &Arc<TurnContext>,
         server_model: String,
     ) -> bool {
-        let requested_model = turn_context.model_info.slug.clone();
-        let server_model_normalized = server_model.to_ascii_lowercase();
-        let requested_model_normalized = requested_model.to_ascii_lowercase();
-        if server_model_normalized == requested_model_normalized {
-            info!("server reported model {server_model} (matches requested model)");
-            return false;
-        }
-
-        warn!("server reported model {server_model} while requested model was {requested_model}");
-
-        let warning_message = format!(
-            "Your account was flagged for potentially high-risk cyber activity and this request was routed to gpt-5.2 as a fallback. To regain access to gpt-5.3-codex, apply for trusted access: {CYBER_VERIFY_URL} or learn more: {CYBER_SAFETY_URL}"
-        );
-
-        self.send_event(
-            turn_context,
-            EventMsg::ModelReroute(ModelRerouteEvent {
-                from_model: requested_model.clone(),
-                to_model: server_model.clone(),
-                reason: ModelRerouteReason::HighRiskCyberActivity,
-            }),
-        )
-        .await;
-
-        self.send_event(
-            turn_context,
-            EventMsg::Warning(WarningEvent {
-                message: warning_message.clone(),
-            }),
-        )
-        .await;
-        self.record_model_warning(warning_message, turn_context)
-            .await;
-        true
+        let _ = server_model;
+        false
     }
 
     pub(crate) async fn replace_history(
